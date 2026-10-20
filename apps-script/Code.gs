@@ -1,16 +1,13 @@
-// 課後練習與音檔庫：把學生的練習成績寫進這個試算表的「成績」工作表
-function doPost(e) {
-  var d = JSON.parse(e.postData.contents);
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName('成績') || ss.insertSheet('成績');
-  if (sh.getLastRow() === 0) {
-    sh.appendRow(['時間', '姓名', '週次', '題組', '模式', '答對', '題數', '正確率', '用時（秒）', '答錯的題號']);
-    sh.setFrozenRows(1);
-  }
-  var rate = d.total ? Math.round(d.score / d.total * 100) + '%' : '';
-  sh.appendRow([new Date(), d.name, '第 ' + d.week + ' 週', d.set, d.mode, d.score, d.total, rate, d.seconds, d.wrong]);
-  return ContentService.createTextOutput('ok');
+// 課後練習與音檔庫：載入器（只要貼一次）
+// 每次有人送成績或讀設定時，會自動從 GitHub 讀取最新的主程式 main.gs。
+var SRC = 'https://raw.githubusercontent.com/qwe0975169776-dotcom/listening-practice/main/apps-script/main.gs';
+function load_() {
+  var cache = CacheService.getScriptCache();
+  var code = cache.get('main');
+  if (!code) { code = UrlFetchApp.fetch(SRC).getContentText(); cache.put('main', code, 300); }
+  (0, eval)(code);
 }
-function doGet() {
-  return ContentService.createTextOutput('課後練習成績接收器正常運作中');
-}
+function doPost(e) { load_(); return handlePost(e); }
+function doGet(e) { load_(); return handleGet(e); }
+// 第一次設定時，在上方選單選「authorize」再按「執行」，允許程式連到 GitHub。
+function authorize() { UrlFetchApp.fetch(SRC); SpreadsheetApp.getActiveSpreadsheet(); Logger.log('授權完成'); }
