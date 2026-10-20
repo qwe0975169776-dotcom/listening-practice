@@ -19,6 +19,7 @@ function okPw_(pw) {
   return hex === PW_SHA256;
 }
 function handlePost(e) {
+  if (!e || !e.postData) { Logger.log('這個函式只在網頁送資料時使用，不用在編輯器按「執行」。'); return ContentService.createTextOutput('no data'); }
   var d = JSON.parse(e.postData.contents);
   if (d.type === 'config') {
     if (!okPw_(d.pw)) return json_({ ok: false, error: 'password' });
