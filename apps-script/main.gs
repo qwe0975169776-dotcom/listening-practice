@@ -1,7 +1,7 @@
 // 課後練習與音檔庫：Apps Script 主程式（由「載入器」自動從 GitHub 讀取，不需要手動貼）
 var PW_SHA256 = 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'; // 老師密碼 12345678 的雜湊
 var RESULT_HEAD = ['時間', '姓名', '週次', '題組', '模式', '答對', '題數', '正確率', '用時（秒）', '答錯的題號', '作答編號'];
-var DETAIL_HEAD = ['時間', '姓名', '週次', '題組', '模式', '題號', '學生的答案', '對錯', '正確答案（隨機題）', '作答編號', '題目序號'];
+var DETAIL_HEAD = ['時間', '姓名', '週次', '題組', '模式', '題號', '學生的答案', '對錯', '正確答案（隨機題）', '作答編號', '題目序號', '題目內容（隨機題）'];
 
 function sheet_(name, head) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -30,7 +30,7 @@ function handlePost(e) {
   var rate = d.total ? Math.round(d.score / d.total * 100) + '%' : '';
   sheet_('成績', RESULT_HEAD).appendRow([now, d.name, '第 ' + d.week + ' 週', d.set, d.mode, d.score, d.total, rate, d.seconds, d.wrong, d.id || '']);
   var rows = (d.details || []).map(function (x) {
-    return [now, d.name, '第 ' + d.week + ' 週', d.set, d.mode, x.n, x.val, x.ok ? '○' : '✕', x.ans || '', d.id || '', x.idx == null ? '' : x.idx];
+    return [now, d.name, '第 ' + d.week + ' 週', d.set, d.mode, x.n, x.val, x.ok ? '○' : '✕', x.ans || '', d.id || '', x.idx == null ? '' : x.idx, x.qd || ''];
   });
   if (rows.length) {
     var sh = sheet_('作答明細', DETAIL_HEAD);
